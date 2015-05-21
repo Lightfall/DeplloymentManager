@@ -8,6 +8,6 @@ namespace DeploymentManager.Middleware
 {
     public class Startup
     {
-      int fHakan;
+      int Hakan;
     }
 }
