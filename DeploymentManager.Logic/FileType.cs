@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DeploymentManager.Logic
 {
-    class FileType
+    public class FileType
     {
     }
 }
