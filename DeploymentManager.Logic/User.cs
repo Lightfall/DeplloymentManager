@@ -14,11 +14,12 @@ namespace DeploymentManager.Logic
         public Roles Role { get; set; }
 
         /// <summary>
-        /// Kullanıcının bağlı oldı
+        /// Kullanıcının bağlı olduğu tedarikçi
         /// </summary>
         public Supplier Supplier { get; set; }
         
         //TODO : GENEL BİLGİLER
+        public string Name { get; set; }
 
         
 

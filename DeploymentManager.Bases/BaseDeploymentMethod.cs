@@ -24,6 +24,7 @@ namespace DeploymentManager.Bases
             //set { _files = value; }
         }
 
+        public string Name { get; set; }
 
         public abstract void Deploy();
 

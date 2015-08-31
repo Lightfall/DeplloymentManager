@@ -5,6 +5,7 @@ using System.Text;
 
 namespace DeploymentManager.Logic
 {
+    [Flags]
     public enum Roles
     {
         UNDEFINED = 0,

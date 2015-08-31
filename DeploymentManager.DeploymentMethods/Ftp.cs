@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DeploymentManager.Bases;
 using System.Net;
 using System.IO;
+using System.Reflection;
 
 
 namespace DeploymentManager.DeploymentMethods
@@ -120,8 +121,6 @@ namespace DeploymentManager.DeploymentMethods
 
         public override void Deploy()
         {
-            throw new NotImplementedException();
-
             foreach (var item in Files)
             {
                 Upload(item);
@@ -133,13 +132,15 @@ namespace DeploymentManager.DeploymentMethods
         {
             try
             {
+
+                string filename = item.Substring(item.LastIndexOf('\\')+1);
                 // Get the object used to communicate with the server.
-                FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://" + Host + "/" + Directory);
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://" + Host + "/" + Directory + "/" + filename);
                 request.Method = WebRequestMethods.Ftp.UploadFile;
 
                 // This example assumes the FTP site uses anonymous logon.
                 request.Credentials = new NetworkCredential(UserName, Password);
-
+                SetMethodRequiresCWD();
                 using (Stream requestStream = request.GetRequestStream())
                 {
                     using (FileStream fileStream = new FileStream(item, FileMode.Open))
@@ -149,7 +150,7 @@ namespace DeploymentManager.DeploymentMethods
                 }
                 using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
                 {
-                    if (response.StatusCode != FtpStatusCode.FileActionOK)
+                    if (response.StatusCode != FtpStatusCode.FileActionOK && response.StatusCode!= FtpStatusCode.ClosingData)
                     {
                         throw new DeploymentException(response.StatusDescription);
                     }
@@ -164,5 +165,33 @@ namespace DeploymentManager.DeploymentMethods
                 throw new DeploymentException(ex.Message, ex);
             }
         }
+
+        private static void SetMethodRequiresCWD()
+        {
+            Type requestType = typeof(FtpWebRequest);
+            FieldInfo methodInfoField = requestType.GetField("m_MethodInfo", BindingFlags.NonPublic | BindingFlags.Instance);
+            Type methodInfoType = methodInfoField.FieldType;
+
+
+            FieldInfo knownMethodsField = methodInfoType.GetField("KnownMethodInfo", BindingFlags.Static | BindingFlags.NonPublic);
+            Array knownMethodsArray = (Array)knownMethodsField.GetValue(null);
+
+            FieldInfo flagsField = methodInfoType.GetField("Flags", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            int MustChangeWorkingDirectoryToPath = 0x100;
+            foreach (object knownMethod in knownMethodsArray)
+            {
+                int flags = (int)flagsField.GetValue(knownMethod);
+                flags |= MustChangeWorkingDirectoryToPath;
+                flagsField.SetValue(knownMethod, flags);
+            }
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+
     }
 }

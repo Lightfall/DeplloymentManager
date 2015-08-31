@@ -8,5 +8,6 @@ namespace DeploymentManager.Logic
     public class Project
     {
         //TODO : GENEL BİLGİLER
+        public string Name { get; set; }
     }
 }
