@@ -5,6 +5,9 @@ using System.Text;
 
 namespace DeploymentManager.Logic
 {
+    /// <summary>
+    /// Tedarikçi firmanın sisteminde oluşmuş taleptir.
+    /// </summary>
     public class ExternalTicket
     {
 
